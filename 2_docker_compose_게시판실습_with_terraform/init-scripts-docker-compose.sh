@@ -46,7 +46,8 @@ DB_NAME=iandb
 EOF
 
 echo "[7/8] docker compose 실행"
-docker compose -f /app/docker-compose.yaml --env-file /app/.env up -d
+# 인스턴스 부팅 시 이미지를 무조건 Docker Hub에서 최신 버전으로 pull한 뒤 실행
+docker compose -f /app/docker-compose.yaml --env-file /app/.env up -d --pull always
 
 echo "[8/8] 완료 플래그 생성"
 touch $FLAG_FILE

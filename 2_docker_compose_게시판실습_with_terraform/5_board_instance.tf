@@ -29,7 +29,7 @@ resource "aws_instance" "st8_board_instance" {
     ]
 
     # User Data 설정
-    # ${path.module}: 현재 테라폼 모듈의 경로를 나타내는 변수.
+    # ${path.module}: 현재 실행 중인 .tf 파일(5_board_instance.tf)이 위치한 디렉토리의 절대 경로를 자동으로 반환하는 테라폼의 내장 변수
     user_data = file("${path.module}/init-scripts-docker-compose.sh")
     user_data_replace_on_change = true # user_data 변경 시 인스턴스 자동 재생성
     
