@@ -15,10 +15,10 @@ services:
   # docker-install (Nginx)
   service-docker-install:
     image: reoyuza/nginx:1.29.7-docker-install
-    build:
-      context: ./docker-install
-      dockerfile: Dockerfile
-    container_name: docker-install-nginx-container
+    # build:
+    #   context: ./docker-install
+    #   dockerfile: Dockerfile
+    # container_name: docker-install-nginx-container
     restart: always
     ports:
       - "8081:80"
