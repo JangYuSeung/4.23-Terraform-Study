@@ -1,6 +1,9 @@
 services:
   # main 서비스 (Nginx)
   service-docker-main:
+    # build:
+    #   context: ./main
+    #   dockerfile: Dockerfile
     image: csjin21c/nginx:1.29.7-docker-main
     container_name: docker-main-nginx-container
     restart: always
@@ -8,6 +11,17 @@ services:
       - "8080:80"
     networks:
       - board-network
+
+  # docker-install (Nginx)
+  service-docker-install:
+    image: csjin21c/nginx:1.29.7-docker-install
+    container_name: docker-install-nginx-container
+    restart: always
+    ports:
+      - "8081:80"
+    networks:
+      - board-network
+
 
 networks:
   board-network:

@@ -15,7 +15,13 @@ output "st8_ex_http_SG" {
     value = data.aws_security_group.st8_ex_http_SG.id
 }
 
+# 가용영역 정보 출력
 output "az_names" {
     value = data.aws_availability_zones.available.names
     description = "사용 가능한 가용영역 정보"
+}
+
+output "docker_alb_dns_name" {
+    value = aws_lb.st8_ex_docker_ALB.dns_name # ALB의 DNS 이름 출력
+    description = "ALB의 DNS 이름"
 }

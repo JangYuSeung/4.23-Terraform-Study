@@ -11,15 +11,15 @@ resource "aws_security_group_rule" "st8_ex_http_SG" {
     source_security_group_id = data.aws_security_group.st8_ex_alb_SG.id
 }
 
-# 첫번째 존의 public subnet에 인스턴스 생성하기
-resource "aws_instance" "st8_ex_instance" {
+# 첫번째 존의 private subnet에 인스턴스 생성하기
+resource "aws_instance" "st8_alb_instance" {
     ami = "ami-0aa31b568c1e8d622" # Amazon Linux 2 AMI
     instance_type = "t3.micro"
 
     key_name = "st8_terraform_test_key" # SSH 키 페어
 
-    subnet_id = data.aws_subnets.st8_ex_public_subnets.ids[0] # 첫 번째 퍼블릭 서브넷에 인스턴스 생성
-    associate_public_ip_address = true # 퍼블릭 IP 자동 할당 (public이니 필수)
+    subnet_id = data.aws_subnets.st8_ex_private_subnets.ids[0] # 첫 번째 프라이빗 서브넷에 인스턴스 생성
+    associate_public_ip_address = false # 퍼블릭 IP 비활성화 (프라이빗 서브넷이므로)
 
     # 스토리지 설정: 루트 볼륨
     root_block_device {
@@ -34,7 +34,11 @@ resource "aws_instance" "st8_ex_instance" {
         data.aws_security_group.st8_ex_ssh-SG.id
     ]
 
-    tags = { Name = "st8_ex_instance" }
+    # User Data 설정
+    # ${path.module}: 현재 테라폼 모듈의 경로를 나타내는 변수.
+    user_data = file("${path.module}/user-data.sh") 
+    
+    tags = { Name = "st8_alb_instance" }
 }
 
 # SSH 키 페어 생성
