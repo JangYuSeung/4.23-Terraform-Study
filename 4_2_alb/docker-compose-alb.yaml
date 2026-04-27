@@ -63,6 +63,17 @@ services:
       - board-network
 
 
+  # docker-fastapi (FastAPI)
+  service-docker-fastapi:
+    image: reoyuza/fastapi:1.0.0-docker-fastapi
+    container_name: docker-fastapi-container
+    restart: always
+    ports:
+      - "8086:80"
+    networks:
+      - board-network
+
+
 networks:
   board-network:
     driver: bridge

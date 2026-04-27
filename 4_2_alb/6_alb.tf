@@ -313,3 +313,47 @@ resource "aws_lb_listener_rule" "swarm_path_rule" {
         }
     }
 }
+
+# 7_1. docker_fastapi 대상그룹 생성(8086)
+resource "aws_lb_target_group" "st8_ex_docker_fastapi_TG" {
+    name = "st8-ex-docker-fastapi-TG"
+    port = 8086
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.st8_ex_vpc.id
+
+    slow_start = 30
+    deregistration_delay = 30
+
+    health_check {
+        path = "/fastapi"
+        protocol = "HTTP"
+        interval = 30
+        timeout = 5
+        healthy_threshold = 2
+        unhealthy_threshold = 3
+    }
+    tags = { Name = "st8_ex_docker_fastapi_TG" }
+}
+
+# 7_2. docker_fastapi 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_docker_fastapi_TG_Attachment" {
+    target_group_arn = aws_lb_target_group.st8_ex_docker_fastapi_TG.arn
+    target_id = aws_instance.st8_alb_instance.id
+    port = 8086
+}
+
+resource "aws_lb_listener_rule" "fastapi_path_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
+    priority = 60
+
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_docker_fastapi_TG.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/fastapi", "/fastapi/*"]
+        }
+    }
+}

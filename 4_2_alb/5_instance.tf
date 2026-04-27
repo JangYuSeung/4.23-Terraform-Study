@@ -1,8 +1,8 @@
 resource "aws_security_group_rule" "st8_ex_http_SG" {
-    # 8080~8085 포트 범위에서 TCP 프로토콜로 인바운드 트래픽 허용
+    # 8080~8086 포트 범위에서 TCP 프로토콜로 인바운드 트래픽 허용
     type = "ingress"
     from_port = 8080
-    to_port = 8085
+    to_port = 8086
     protocol = "tcp"
     
     # 위 규칙을 http 보안 그룹에 적용
@@ -31,7 +31,8 @@ resource "aws_instance" "st8_alb_instance" {
     # 보안 그룹 설정: SSH와 HTTP 트래픽 허용
     vpc_security_group_ids = [
         data.aws_security_group.st8_ex_http_SG.id,
-        data.aws_security_group.st8_ex_ssh-SG.id
+        data.aws_security_group.st8_ex_ssh-SG.id,
+        data.aws_security_group.st8_ex_fastapi-SG.id # fastapi 보안 그룹 추가
     ]
 
     # User Data 설정
@@ -46,4 +47,20 @@ resource "aws_instance" "st8_alb_instance" {
 resource "aws_key_pair" "st8_terraform_test_key" {
     key_name = "st8_terraform_test_key" # 키 페어 이름
     public_key = file("C:/Users/user/.ssh/st8_terraform_test_key.pub")
+}
+
+# ########################################################################
+# AMI 인스턴스 생성
+# ========================================================================
+resource "aws_ami_from_instance" "st8_ex_ami" {
+    name = "st8-ex-ami"
+    # AMI를 생성할 인스턴스 정의
+    source_instance_id = aws_instance.st8_alb_instance.id
+
+    # AMI 생성 시 인스턴스 재부팅 여부 설정
+    # true: 인스턴스를 종료하지 않고 AMI 생성
+    # default(false): 인스턴스를 일시적으로 종료하여 AMI 생성
+    snapshot_without_reboot = false
+
+    tags = { Name = "st8_ex_ami" }
 }

@@ -25,3 +25,19 @@ output "docker_alb_dns_name" {
     value = aws_lb.st8_ex_docker_ALB.dns_name # ALB의 DNS 이름 출력
     description = "ALB의 DNS 이름"
 }
+
+# 시작 템플릿
+output "launch_template_latest_version" {
+    value = aws_launch_template.st8_ex_LT.latest_version # 시작 템플릿의 최신 버전 번호 출력
+    description = "시작 템플릿의 최신 버전 번호"
+}
+
+output "launch_template_default_version" {
+    value = aws_launch_template.st8_ex_LT.default_version # 시작 템플릿의 기본 버전 번호 출력
+    description = "시작 템플릿의 기본 버전 번호"
+}
+
+output "launch_template_description" {
+    value = aws_launch_template.st8_ex_LT.description # 시작 템플릿의 설명 출력
+    description = "시작 템플릿의 설명"
+}
