@@ -32,6 +32,118 @@ resource "aws_lb_target_group_attachment" "st8_ex_docker_main_TG_Attachment" {
     port = 8080 # 대상그룹의 포트와 일치시켜야 함
 }
 
+# 3_1. docker_build 대상그룹 생성(8082)
+resource "aws_lb_target_group" "st8_ex_docker_build_TG" {
+    name = "st8-ex-docker-build-TG"
+    port = 8082
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.st8_ex_vpc.id
+
+    slow_start = 30
+    deregistration_delay = 30
+
+    health_check {
+        path = "/"
+        protocol = "HTTP"
+        interval = 30
+        timeout = 5
+        healthy_threshold = 2
+        unhealthy_threshold = 3
+    }
+    tags = { Name = "st8_ex_docker_build_TG" }
+}
+
+# 3_2. docker_build 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_docker_build_TG_Attachment" {
+    target_group_arn = aws_lb_target_group.st8_ex_docker_build_TG.arn
+    target_id = aws_instance.st8_alb_instance.id
+    port = 8082
+}
+
+# 4_1. docker_command 대상그룹 생성(8083)
+resource "aws_lb_target_group" "st8_ex_docker_command_TG" {
+    name = "st8-ex-docker-command-TG"
+    port = 8083
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.st8_ex_vpc.id
+
+    slow_start = 30
+    deregistration_delay = 30
+
+    health_check {
+        path = "/"
+        protocol = "HTTP"
+        interval = 30
+        timeout = 5
+        healthy_threshold = 2
+        unhealthy_threshold = 3
+    }
+    tags = { Name = "st8_ex_docker_command_TG" }
+}
+
+# 4_2. docker_command 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_docker_command_TG_Attachment" {
+    target_group_arn = aws_lb_target_group.st8_ex_docker_command_TG.arn
+    target_id = aws_instance.st8_alb_instance.id
+    port = 8083
+}
+
+# 5_1. docker_compose 대상그룹 생성(8084)
+resource "aws_lb_target_group" "st8_ex_docker_compose_TG" {
+    name = "st8-ex-docker-compose-TG"
+    port = 8084
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.st8_ex_vpc.id
+
+    slow_start = 30
+    deregistration_delay = 30
+
+    health_check {
+        path = "/"
+        protocol = "HTTP"
+        interval = 30
+        timeout = 5
+        healthy_threshold = 2
+        unhealthy_threshold = 3
+    }
+    tags = { Name = "st8_ex_docker_compose_TG" }
+}
+
+# 5_2. docker_compose 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_docker_compose_TG_Attachment" {
+    target_group_arn = aws_lb_target_group.st8_ex_docker_compose_TG.arn
+    target_id = aws_instance.st8_alb_instance.id
+    port = 8084
+}
+
+# 6_1. docker_swarm 대상그룹 생성(8085)
+resource "aws_lb_target_group" "st8_ex_docker_swarm_TG" {
+    name = "st8-ex-docker-swarm-TG"
+    port = 8085
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.st8_ex_vpc.id
+
+    slow_start = 30
+    deregistration_delay = 30
+
+    health_check {
+        path = "/"
+        protocol = "HTTP"
+        interval = 30
+        timeout = 5
+        healthy_threshold = 2
+        unhealthy_threshold = 3
+    }
+    tags = { Name = "st8_ex_docker_swarm_TG" }
+}
+
+# 6_2. docker_swarm 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_docker_swarm_TG_Attachment" {
+    target_group_arn = aws_lb_target_group.st8_ex_docker_swarm_TG.arn
+    target_id = aws_instance.st8_alb_instance.id
+    port = 8085
+}
+
 # 2_1. docker_install 대상그룹 생성(8081)
 resource "aws_lb_target_group" "st8_ex_docker_install_TG" {
     name = "st8-ex-docker-install-TG"
@@ -134,6 +246,70 @@ resource "aws_lb_listener_rule" "install_path_install_rule" {
     condition {
         path_pattern {
             values = ["/install", "/install/*"] # /install 또는 /install/로 시작하는 모든 경로에 대해 이 규칙 적용
+        }
+    }
+}
+
+resource "aws_lb_listener_rule" "build_path_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
+    priority = 20
+
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_docker_build_TG.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/build", "/build/*"]
+        }
+    }
+}
+
+resource "aws_lb_listener_rule" "command_path_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
+    priority = 30
+
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_docker_command_TG.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/command", "/command/*"]
+        }
+    }
+}
+
+resource "aws_lb_listener_rule" "compose_path_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
+    priority = 40
+
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_docker_compose_TG.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/compose", "/compose/*"]
+        }
+    }
+}
+
+resource "aws_lb_listener_rule" "swarm_path_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
+    priority = 50
+
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_docker_swarm_TG.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/swarm", "/swarm/*"]
         }
     }
 }
