@@ -1,4 +1,4 @@
-# 1. 대상 그룹 
+# 1_1. docker_main 대상그룹 생성(8080)
 resource "aws_lb_target_group" "st8_ex_docker_main_TG" {
     name = "st8-ex-docker-main-TG"
     # 외부 - 중간(대상그룹) - 컨테이너라고 했을 때, 중간 포트(=컨테이너 입장에서 external 포트)
@@ -24,13 +24,45 @@ resource "aws_lb_target_group" "st8_ex_docker_main_TG" {
     tags = { Name = "st8_ex_docker_main_TG" }
 }
 
-
-# 2. 대상 그룹 인스턴스 등록
+# 1_2. docker_main 대상그룹에 인스턴스 등록
 resource "aws_lb_target_group_attachment" "st8_ex_docker_main_TG_Attachment" {
     # 어느 대상 그룹에 등록할지 지정
     target_group_arn = aws_lb_target_group.st8_ex_docker_main_TG.arn # 위에서 생성한 대상의 그룹의 ARN
     target_id = aws_instance.st8_alb_instance.id # 생성한 인스턴스 ID로 등록
     port = 8080 # 대상그룹의 포트와 일치시켜야 함
+}
+
+# 2_1. docker_install 대상그룹 생성(8081)
+resource "aws_lb_target_group" "st8_ex_docker_install_TG" {
+    name = "st8-ex-docker-install-TG"
+    # 외부 - 중간(대상그룹) - 컨테이너라고 했을 때, 중간 포트(=컨테이너 입장에서 external 포트)
+    port = 8081 # docker run -p 8081:80 
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.st8_ex_vpc.id
+
+    # 인스턴스가 처음 시작하여 접속 시 비율을 점진적으로 증가할 여유 시간(선택)
+    # 30초로 설정하여, 인스턴스가 시작된 후 30초 동안은 트래픽이 점진적으로 증가하도록 합니다.
+    slow_start = 30 # 초
+    # 인스턴스 종료 시, 기존 연결 유지 시간(선택)
+    deregistration_delay = 30 # 초
+
+    health_check {
+        path = "/"
+        protocol = "HTTP"
+        interval = 30 # "간격"= 30초마다 헬스체크
+        timeout = 5 # 5초 동안 응답이 없으면 헬스체크 실패로 간주
+        healthy_threshold = 2 # 2번 연속 헬스체크 성공 시 healthy로 간주
+        unhealthy_threshold = 3 # 3번 연속 헬스체크 실패 시 unhealthy로 간주
+    }
+    tags = { Name = "st8_ex_docker_install_TG" }
+}
+
+# 2_2. docker_install 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_docker_install_TG_Attachment" {
+    # 어느 대상 그룹에 등록할지 지정
+    target_group_arn = aws_lb_target_group.st8_ex_docker_install_TG.arn # 위에서 생성한 대상의 그룹의 ARN
+    target_id = aws_instance.st8_alb_instance.id # 생성한 인스턴스 ID로 등록
+    port = 8081 # 대상그룹의 포트와 일치시켜야 함
 }
 
 # 3. ALB 생성
@@ -87,3 +119,21 @@ resource "aws_lb_listener" "st8_ex_alb_http_listener" {
 }
 
 # 5. ALB 리스너 규칙 생성 (기본 규칙: 모든 요청을 대상 그룹으로 라우팅)
+# ==========================================================
+resource "aws_lb_listener_rule" "install_path_install_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn # HTTPS 리스너에 규칙 추가
+    priority = 10 # 기본 규칙보다 우선순위 높아야 함(낮은 숫자가 더 높은 우선순위)
+
+    # Target Group 정의
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_docker_install_TG.arn # docker_install 대상 그룹으로 라우팅
+    }
+
+    # 경로 정의: value의 ,는 "또는"을 의미
+    condition {
+        path_pattern {
+            values = ["/install", "/install/*"] # /install 또는 /install/로 시작하는 모든 경로에 대해 이 규칙 적용
+        }
+    }
+}

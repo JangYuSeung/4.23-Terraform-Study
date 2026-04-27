@@ -37,7 +37,8 @@ resource "aws_instance" "st8_alb_instance" {
     # User Data 설정
     # ${path.module}: 현재 테라폼 모듈의 경로를 나타내는 변수.
     user_data = file("${path.module}/user-data.sh") 
-    
+    user_data_replace_on_change = true # user_data 변경 시 인스턴스 자동 재생성
+
     tags = { Name = "st8_alb_instance" }
 }
 
