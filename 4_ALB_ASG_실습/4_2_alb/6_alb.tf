@@ -314,10 +314,10 @@ resource "aws_lb_listener_rule" "swarm_path_rule" {
     }
 }
 
-# 7_1. docker_fastapi 대상그룹 생성(8086)
-resource "aws_lb_target_group" "st8_ex_docker_fastapi_TG" {
-    name = "st8-ex-docker-fastapi-TG"
-    port = 8086
+# 7_1. kubernetes_fastapi 대상그룹 생성(8087)
+resource "aws_lb_target_group" "st8_ex_kubernetes_fastapi_TG" {
+    name = "st8-ex-kubernetes-fastapi-TG"
+    port = 8087
     protocol = "HTTP"
     vpc_id = data.aws_vpc.st8_ex_vpc.id
 
@@ -325,35 +325,81 @@ resource "aws_lb_target_group" "st8_ex_docker_fastapi_TG" {
     deregistration_delay = 30
 
     health_check {
-        path = "/fastapi"
+        path = "/kubernetes"
         protocol = "HTTP"
         interval = 30
         timeout = 5
         healthy_threshold = 2
         unhealthy_threshold = 3
     }
-    tags = { Name = "st8_ex_docker_fastapi_TG" }
+    tags = { Name = "st8_ex_kubernetes_fastapi_TG" }
 }
 
-# 7_2. docker_fastapi 대상그룹에 인스턴스 등록
-resource "aws_lb_target_group_attachment" "st8_ex_docker_fastapi_TG_Attachment" {
-    target_group_arn = aws_lb_target_group.st8_ex_docker_fastapi_TG.arn
+# 7_2. kubernetes_fastapi 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_kubernetes_fastapi_TG_Attachment" {
+    target_group_arn = aws_lb_target_group.st8_ex_kubernetes_fastapi_TG.arn
     target_id = aws_instance.st8_alb_instance.id
-    port = 8086
+    port = 8087
 }
 
-resource "aws_lb_listener_rule" "fastapi_path_rule" {
+# 7_3. /kubernetes 경로 규칙
+resource "aws_lb_listener_rule" "kubernetes_path_rule" {
     listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
     priority = 60
 
     action {
         type = "forward"
-        target_group_arn = aws_lb_target_group.st8_ex_docker_fastapi_TG.arn
+        target_group_arn = aws_lb_target_group.st8_ex_kubernetes_fastapi_TG.arn
     }
 
     condition {
         path_pattern {
-            values = ["/fastapi", "/fastapi/*"]
+            values = ["/kubernetes", "/kubernetes/*"]
+        }
+    }
+}
+
+# 8_1. board_nginx 대상그룹 생성(8088)
+resource "aws_lb_target_group" "st8_ex_board_nginx_TG" {
+    name = "st8-ex-board-nginx-TG"
+    port = 8088
+    protocol = "HTTP"
+    vpc_id = data.aws_vpc.st8_ex_vpc.id
+
+    slow_start = 30
+    deregistration_delay = 30
+
+    health_check {
+        path = "/board"
+        protocol = "HTTP"
+        interval = 30
+        timeout = 5
+        healthy_threshold = 2
+        unhealthy_threshold = 3
+    }
+    tags = { Name = "st8_ex_board_nginx_TG" }
+}
+
+# 8_2. board_nginx 대상그룹에 인스턴스 등록
+resource "aws_lb_target_group_attachment" "st8_ex_board_nginx_TG_Attachment" {
+    target_group_arn = aws_lb_target_group.st8_ex_board_nginx_TG.arn
+    target_id = aws_instance.st8_alb_instance.id
+    port = 8088
+}
+
+# 8_3. /board 경로 규칙
+resource "aws_lb_listener_rule" "board_path_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
+    priority = 70
+
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_board_nginx_TG.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/board", "/board/*"]
         }
     }
 }

@@ -2,10 +2,10 @@
 
 # 보안 그룹 규칙 추가: ALB에서 인스턴스로의 HTTP 트래픽 허용
 resource "aws_security_group_rule" "st8_ex_http_SG" {
-    # 8080~8086 포트 범위에서 TCP 프로토콜로 인바운드 트래픽 허용
+    # 8080~8088 포트 범위에서 TCP 프로토콜로 인바운드 트래픽 허용
     type = "ingress"
     from_port = 8080
-    to_port = 8086
+    to_port = 8088
     protocol = "tcp"
     
     # 위 규칙을 http 보안 그룹에 적용
@@ -35,7 +35,6 @@ resource "aws_instance" "st8_alb_instance" {
     vpc_security_group_ids = [
         data.aws_security_group.st8_ex_http_SG.id,
         data.aws_security_group.st8_ex_ssh-SG.id,
-        data.aws_security_group.st8_ex_fastapi-SG.id # fastapi 보안 그룹 추가
     ]
 
     # User Data 설정

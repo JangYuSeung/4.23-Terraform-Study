@@ -39,14 +39,6 @@ data "aws_security_group" "st8_ex_ssh-SG" {
     }
 }
 
-# ec2 인스턴스 보안 그룹 정보: fastapi_SG
-data "aws_security_group" "st8_ex_fastapi-SG" {
-    filter {
-        name = "tag:Name"
-        values = ["st8_ex_fastapi-SG"]
-    }
-}
-
 # ALB 보안 그룹 정보
 data "aws_security_group" "st8_ex_alb_SG" {
     filter {
