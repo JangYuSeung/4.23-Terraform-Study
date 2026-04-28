@@ -84,28 +84,3 @@ resource "aws_security_group_rule" "allow_alb_to_http" {
     # ALB 보안 그룹에서 온 트래픽만 허용
     source_security_group_id = aws_security_group.st8_ex_alb_SG.id # 소스: ALB 보안 그룹에서만 허용
 }
-
-# fastapi 보안그룹 추가 (나머지 보안 그룹 리소스는 4_1_vpc_security_group.tf에 있음)
-# EC2 보안 그룹 => fastapi 인바운드 허용
-resource "aws_security_group" "st8_ex_fastapi-SG" {
-    name = "st8_ex_fastapi-SG"
-    vpc_id = aws_vpc.st8_ex_vpc.id
-    description = "Allow fastapi traffic"
-    
-    # fastapi 인바운드 트래픽 허용
-    ingress {
-        from_port = 8086
-        to_port = 8086
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"] # 모든 IP 주소에서 허용
-    }
-
-    egress {
-        from_port = 0
-        to_port = 0
-        protocol = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    tags = { Name = "st8_ex_fastapi-SG" }
-}

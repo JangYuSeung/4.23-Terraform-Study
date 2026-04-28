@@ -325,8 +325,12 @@ resource "aws_lb_target_group" "st8_ex_kubernetes_fastapi_TG" {
     deregistration_delay = 30
 
     health_check {
-        path = "/kubernetes"
+        # FastAPI(root_path="/kubernetes") 환경에서 /kubernetes 또는 /kubernetes/ 요청이
+        # 환경에 따라 200/307/404 등을 반환할 수 있음. matcher를 200-399로 확장해
+        # 리다이렉트도 healthy로 인정.
+        path = "/kubernetes/"
         protocol = "HTTP"
+        matcher = "200-399"
         interval = 30
         timeout = 5
         healthy_threshold = 2
@@ -400,6 +404,24 @@ resource "aws_lb_listener_rule" "board_path_rule" {
     condition {
         path_pattern {
             values = ["/board", "/board/*"]
+        }
+    }
+}
+
+# 8_4. /api/board 경로 규칙 (list.html 내부에서 호출하는 백엔드 API)
+# board-nginx의 location /api/board/ 가 board-fastapi로 proxy_pass 함.
+resource "aws_lb_listener_rule" "board_api_path_rule" {
+    listener_arn = aws_lb_listener.st8_ex_alb_https_listener.arn
+    priority = 80
+
+    action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.st8_ex_board_nginx_TG.arn
+    }
+
+    condition {
+        path_pattern {
+            values = ["/api/board", "/api/board/*"]
         }
     }
 }
