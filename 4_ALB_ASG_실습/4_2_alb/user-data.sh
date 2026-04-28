@@ -26,11 +26,23 @@ usermod -aG docker ec2-user
 mkdir -p /opt/ian-alb-project && cd /opt/ian-alb-project
 wget https://raw.githubusercontent.com/JangYuSeung/4.23-Terraform-Study/refs/heads/main/4_2_alb/docker-compose-alb.yaml
 
-# 5. 컨테이너 실행
-# --pull always를 통해 인스턴스 생성 시점에 가장 최신 이미지를 가져옵니다.
-docker compose -f docker-compose-alb.yaml up -d --pull always
+# 5. board 서비스용 .env 파일 생성
+cat > /opt/ian-alb-project/.env << 'EOF'
+MYSQL_ROOT_PASSWORD=ian1234!
+MYSQL_DATABASE=iandb
+MYSQL_USER=ian
+MYSQL_PASSWORD=ian1234!
+DB_HOST=mysql-primary-container
+DB_USER=ian
+DB_PASSWORD=ian1234!
+DB_NAME=iandb
+EOF
 
-# 6. 완료 플래그 생성
+# 6. 컨테이너 실행
+# --pull always를 통해 인스턴스 생성 시점에 가장 최신 이미지를 가져옵니다.
+docker compose -f docker-compose-alb.yaml --env-file .env up -d --pull always
+
+# 7. 완료 플래그 생성
 # touch 대신 이렇게 쓰면 날짜와 시간이 파일 안에 기록됩니다.
 date > "$FLAG_FILE"
 echo "Terraform App Instance Setup Complete" >> "$FLAG_FILE"

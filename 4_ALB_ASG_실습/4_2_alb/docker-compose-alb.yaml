@@ -63,16 +63,56 @@ services:
       - board-network
 
 
-  # docker-fastapi (FastAPI)
-  service-docker-fastapi:
-    image: reoyuza/fastapi:1.0.0-docker-fastapi
-    container_name: docker-fastapi-container
+  # kubernetes (FastAPI - /kubernetes path 기반 직접 연결)
+  service-kubernetes-fastapi:
+    image: reoyuza/fastapi-kubernetes:latest
+    container_name: kubernetes-fastapi-container
     restart: always
     ports:
-      - "8086:80"
+      - "8087:8000"
     networks:
       - board-network
 
+  # board MySQL
+  service-board-mysql:
+    image: reoyuza/mysql-board:latest
+    container_name: mysql-primary-container
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Seoul
+    networks:
+      - board-network
+
+  # board FastAPI (포트 노출 없음 - nginx 통해서만 접근)
+  service-board-fastapi:
+    image: reoyuza/fastapi-board:latest
+    container_name: board-fastapi-container
+    restart: always
+    depends_on:
+      - service-board-mysql
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    networks:
+      - board-network
+
+  # board Nginx (리버스 프록시 - ALB에서 8088로 받음)
+  service-board-nginx:
+    image: reoyuza/nginx-board:latest
+    container_name: board-nginx-container
+    restart: always
+    depends_on:
+      - service-board-fastapi
+    ports:
+      - "8088:80"
+    networks:
+      - board-network
 
 networks:
   board-network:
