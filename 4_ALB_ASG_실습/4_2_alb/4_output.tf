@@ -21,23 +21,23 @@ output "az_names" {
     description = "사용 가능한 가용영역 정보"
 }
 
-output "docker_alb_dns_name" {
-    value = aws_lb.st8_ex_docker_ALB.dns_name # ALB의 DNS 이름 출력
-    description = "ALB의 DNS 이름"
-}
+# ALB/ASG 관련 output은 6_alb.tf, 7_asg.tf 활성화 후 주석 해제
+# output "docker_alb_dns_name" {
+#     value = aws_lb.st8_ex_docker_ALB.dns_name
+#     description = "ALB의 DNS 이름"
+# }
 
-# 시작 템플릿
-output "launch_template_latest_version" {
-    value = aws_launch_template.st8_ex_LT.latest_version # 시작 템플릿의 최신 버전 번호 출력
-    description = "시작 템플릿의 최신 버전 번호"
-}
+# output "launch_template_latest_version" {
+#     value = aws_launch_template.st8_ex_LT.latest_version
+#     description = "시작 템플릿의 최신 버전 번호"
+# }
 
-output "launch_template_default_version" {
-    value = aws_launch_template.st8_ex_LT.default_version # 시작 템플릿의 기본 버전 번호 출력
-    description = "시작 템플릿의 기본 버전 번호"
-}
+# output "launch_template_default_version" {
+#     value = aws_launch_template.st8_ex_LT.default_version
+#     description = "시작 템플릿의 기본 버전 번호"
+# }
 
-output "launch_template_description" {
-    value = aws_launch_template.st8_ex_LT.description # 시작 템플릿의 설명 출력
-    description = "시작 템플릿의 설명"
-}
+# output "launch_template_description" {
+#     value = aws_launch_template.st8_ex_LT.description
+#     description = "시작 템플릿의 설명"
+# }

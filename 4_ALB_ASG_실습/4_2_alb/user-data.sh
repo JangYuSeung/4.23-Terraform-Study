@@ -24,8 +24,7 @@ usermod -aG docker ec2-user
 
 # 4. 프로젝트 디렉토리 설정 및 파일 다운로드
 mkdir -p /opt/ian-alb-project && cd /opt/ian-alb-project
-wget https://raw.githubusercontent.com/JangYuSeung/4.23-Terraform-Study/refs/heads/main/4_2_alb/docker-compose-alb.yaml
-
+wget https://raw.githubusercontent.com/JangYuSeung/4.23-Terraform-Study/refs/heads/main/4_ALB_ASG_%EC%8B%A4%EC%8A%B5/4_2_alb/docker-compose-alb.yaml
 # 5. board 서비스용 .env 파일 생성
 cat > /opt/ian-alb-project/.env << 'EOF'
 MYSQL_ROOT_PASSWORD=ian1234!

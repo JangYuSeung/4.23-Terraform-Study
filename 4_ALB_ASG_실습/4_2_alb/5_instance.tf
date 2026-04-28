@@ -70,15 +70,15 @@ resource "aws_key_pair" "st8_terraform_test_key" {
 # vpc_security_group_ids = [...]                   # 보안그룹 변경
 # key_name               = "new-key"              # 키페어 변경
 # ========================================================================
-resource "aws_ami_from_instance" "st8_ex_ami" {
-    name = "st8-ex-ami"
-    # AMI를 생성할 인스턴스 정의
-    source_instance_id = aws_instance.st8_alb_instance.id
+# resource "aws_ami_from_instance" "st8_ex_ami" {
+#     name = "st8-ex-ami"
+#     # AMI를 생성할 인스턴스 정의
+#     source_instance_id = aws_instance.st8_alb_instance.id
 
-    # AMI 생성 시 인스턴스 재부팅 여부 설정
-    # true: 인스턴스를 종료하지 않고 AMI 생성
-    # default(false): 인스턴스를 일시적으로 종료하여 AMI 생성
-    snapshot_without_reboot = false
+#     # AMI 생성 시 인스턴스 재부팅 여부 설정
+#     # true: 인스턴스를 종료하지 않고 AMI 생성
+#     # default(false): 인스턴스를 일시적으로 종료하여 AMI 생성
+#     snapshot_without_reboot = false
 
-    tags = { Name = "st8_ex_ami" }
-}
+#     tags = { Name = "st8_ex_ami" }
+# }
