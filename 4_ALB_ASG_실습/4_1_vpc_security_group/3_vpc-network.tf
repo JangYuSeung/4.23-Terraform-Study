@@ -28,10 +28,6 @@ resource "aws_subnet" "st8_ex_public_subnets" {
 
     tags = { 
         Name = "st8_ex_public${count.index + 1}_subnet"
-        
-        # 아래 추가(4.29)
-        # EKS가 이 서브넷을 ELB용으로 인식하도록 하는 태그
-        "kubernetes.io/role/elb" = "1"
     }
 }
 
@@ -48,9 +44,6 @@ resource "aws_subnet" "st8_ex_private_subnets" {
     
     tags = { 
         Name = "st8_ex_private${count.index + 1}_subnet"
-        # 아래 추가(4.29)
-        # EKS 가 이 서브넷을 내부 ELB용으로 인식하도록 하는 태그
-	    "kubernetes.io/role/internal-elb" = "1" 
     }
 }
 

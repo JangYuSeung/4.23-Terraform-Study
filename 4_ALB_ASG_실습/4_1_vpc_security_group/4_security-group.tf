@@ -19,16 +19,6 @@ resource "aws_security_group" "st8_ex_alb_SG" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
-    # 아래 추가(4.29)
-    # Kubelet API 트래픽 허용
-    ingress {
-        from_port = 10250
-        to_port = 10250
-        protocol = "tcp"
-        description = "Allow Kubelet API to communicate with control plane"
-        # 보안을 위해 클러스터 보안 그룹만 허용하도록 설정 가능
-        # security_groups = [aws_eks_cluster.main.vpc_config[0].cluster_primary_security_group_id]
-    }
 
     # 아웃바운드 트래픽 허용 (기본값은 모든 트래픽 허용)
     egress {
