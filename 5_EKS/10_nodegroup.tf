@@ -7,7 +7,7 @@ resource "aws_launch_template" "st8_ex_LT" {
     image_id = "ami-0fd01939d29afc17e"
     name_prefix = "st8-ex-LT" # 인스턴스 이름 접두사
     instance_type = "t3.large" # EKS 인스턴스는 최소 medium 이상임!
-    key_name = "st8_terraform_test_key"
+    # key_name = "st8_terraform_test_key"
 
     vpc_security_group_ids = [
         data.aws_security_group.st8_http_SG.id,
@@ -24,16 +24,16 @@ resource "aws_launch_template" "st8_ex_LT" {
 
     # user_data = filebase64("${path.module}/user_data.sh") # 인스턴스 시작 시 실행할 스크립트 (base64로 인코딩된 파일 경로)
     user_data = base64encode(<<-EOF
-        ---
-        apiVersion: node.eks.awsv1alpha1
-        kind: NodeConfig
-        spec:
-          cluster:
-            name: ${aws_eks_cluster.st8_cluster.name}
-            apiServerEndpoint: ${aws_eks_cluster.st8_cluster.endpoint}
-            certificateAuthority: ${aws_eks_cluster.st8_cluster.certificate_authority[0].data}
-            cidr: ${aws_eks_cluster.st8_cluster.kubernetes_network_config[0].service_ipv4_cidr}
-    EOF
+---
+apiVersion: node.eks.aws/v1alpha1
+kind: NodeConfig
+spec:
+  cluster:
+    name: ${aws_eks_cluster.st8_cluster.name}
+    apiServerEndpoint: ${aws_eks_cluster.st8_cluster.endpoint}
+    certificateAuthority: ${aws_eks_cluster.st8_cluster.certificate_authority[0].data}
+    cidr: ${aws_eks_cluster.st8_cluster.kubernetes_network_config[0].service_ipv4_cidr}
+EOF
     )
 
     tag_specifications {

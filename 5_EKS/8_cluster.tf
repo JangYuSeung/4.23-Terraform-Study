@@ -27,4 +27,9 @@ resource "aws_eks_cluster" "st8_cluster" {
     depends_on = [
         aws_iam_role_policy_attachment.cluster_policy_attachment
     ]
+
+    # EKS 클러스터 생성 후 AZ 변경 불가 => 서브넷 변경 무시
+    lifecycle {
+        ignore_changes = [vpc_config]
+    }
 }

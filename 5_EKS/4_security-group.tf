@@ -11,7 +11,6 @@ resource "aws_security_group" "st8_ex_alb_SG" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"] # 소스: Anywhere (모든 IP 주소에서 허용)
     }
-
     ingress {
         # HTTPS 인바운드 트래픽 허용
         from_port = 443 
@@ -19,7 +18,6 @@ resource "aws_security_group" "st8_ex_alb_SG" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
-
     # 아웃바운드 트래픽 허용 (기본값은 모든 트래픽 허용)
     egress {
         from_port = 0 # 모든 포트 허용
@@ -27,7 +25,6 @@ resource "aws_security_group" "st8_ex_alb_SG" {
         protocol = "-1" # 모든 프로토콜 허용
         cidr_blocks = ["0.0.0.0/0"] # 모든 IP 주소로 허용
     }
-
     tags = { Name = "st8_ex_alb_SG" }
 }
 
@@ -44,14 +41,12 @@ resource "aws_security_group" "st8_ex_ssh-SG" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"] # 모든 IP 주소에서 허용
     }
-
     egress {
         from_port = 0
         to_port = 0
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
-
     tags = { Name = "st8_ex_ssh-SG" }
 }
 
@@ -67,13 +62,12 @@ resource "aws_security_group" "st8_ex_http_SG" {
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
-
     tags = { Name = "st8_ex_http_SG" }
 }
 
-# 보안 그룹 규칙 생성
+# 보안 그룹 규칙 생성 후 위 보안 그룹에 적용
 resource "aws_security_group_rule" "allow_alb_to_http" {
-    # 보안 규칙 유형: 인바운드 트래픽 허용
+    # 보안 규칙 유형: ingress (80)
     type = "ingress"
     from_port = 80
     to_port = 80
